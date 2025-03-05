@@ -11,6 +11,7 @@ import color from 'picocolors'
 import type { Dev } from '../config/dev/index.js'
 import type { Server } from '../config/server/index.js'
 import { debug } from '../debug.js'
+import { getIp } from '../utils/getIp.js'
 import { CompilationIdPlugin } from '../webpack/CompilationIdPlugin.js'
 import { ProvidePlugin } from '../webpack/ProvidePlugin.js'
 
@@ -20,8 +21,8 @@ export function pluginDev(
 ): RsbuildPlugin {
   return {
     name: 'lynx:rsbuild:dev',
-    async setup(api) {
-      const hostname = server?.host ?? await findIp('v4')
+    setup(api) {
+      const hostname = server?.host ?? getIp()
 
       let assetPrefix = options?.assetPrefix
 
@@ -131,52 +132,4 @@ export function pluginDev(
       })
     },
   }
-}
-
-export async function findIp(family: 'v4' | 'v6'): Promise<string> {
-  const [
-    { default: defaultGateway },
-    { default: ipaddr },
-    os,
-  ] = await Promise.all([
-    import('default-gateway'),
-
-    import('ipaddr.js'),
-    import('node:os'),
-  ])
-  const gateway = await (async () => {
-    if (family === 'v4') {
-      const { gateway } = await defaultGateway.gateway4async()
-      return gateway
-    } else {
-      const { gateway } = await defaultGateway.gateway6async()
-      return gateway
-    }
-  })()
-  const gatewayIp = ipaddr.parse(gateway)
-
-  // Look for the matching interface in all local interfaces.
-  for (const addresses of Object.values(os.networkInterfaces())) {
-    if (!addresses) {
-      continue
-    }
-
-    for (const { cidr, internal } of addresses) {
-      if (!cidr || internal) {
-        continue
-      }
-
-      const net = ipaddr.parseCIDR(cidr)
-
-      if (
-        net[0]
-        && net[0].kind() === gatewayIp.kind()
-        && gatewayIp.match(net)
-      ) {
-        return net[0].toString()
-      }
-    }
-  }
-
-  throw new Error(`No valid IP found for the default gateway ${gateway}`)
 }

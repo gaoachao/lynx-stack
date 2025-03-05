@@ -13,9 +13,10 @@
   );
   box-shadow: 0px 12.93px 28.74px 0px #ffd28db2 inset;
   border-radius: 50%;
+
   width: 200vw;
   height: 200vw;
-  top: -60vw;
+  top: -70vw;
   left: -14.27vw;
   transform: rotate(15.25deg);
 }

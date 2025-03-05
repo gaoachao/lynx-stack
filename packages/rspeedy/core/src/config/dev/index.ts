@@ -2,6 +2,7 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 import type { WatchFiles } from '@rsbuild/core'
+import type { Rspack } from '@rsbuild/core'
 
 import type { Client } from './client.js'
 
@@ -138,4 +139,14 @@ export interface Dev {
    * ```
    */
   writeToDisk?: boolean | ((filename: string) => boolean) | undefined
+
+  /**
+   * Enable lazy compilation.
+   *
+   * @default false
+   */
+  lazyCompilation?:
+    | boolean
+    | Omit<Rspack.LazyCompilationOptions, 'backend'>
+    | undefined
 }

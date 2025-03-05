@@ -243,6 +243,7 @@ class CssExtractRspackPluginImpl {
                   content: encoded.toString('base64'),
                   deps: cssDeps,
                 };
+                console.log("[gcc] filename",filename)
                 compilation.emitAsset(
                   filename.replace(
                     '.css',
